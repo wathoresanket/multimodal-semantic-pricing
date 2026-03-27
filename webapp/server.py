@@ -62,9 +62,8 @@ class ExplainRequest(BaseModel):
 
 @app.post("/api/analyze")
 async def analyze_product(req: DealCheckRequest):
-    """Master endpoint: predictions, deal check, similar products, and explainability."""
+    """Master endpoint: predictions and semantic search."""
     pred, idx = get_services()
-    from webapp.explainer import compute_text_shap, compute_gradcam
 
     title = req.text
     image_url = req.image_url
@@ -100,63 +99,16 @@ async def analyze_product(req: DealCheckRequest):
     result = pred.predict(input_text, image_url, image_base64)
     fair_price = result['predicted_price']
 
-    # ── 3. Compute Deal Score ─────────────────────────────────────
-    diff_pct = 0
-    verdict = "N/A"
-    verdict_class = "unknown"
-
-    if listed_price and listed_price > 0:
-        if fair_price > 0:
-            diff_pct = ((fair_price - listed_price) / fair_price) * 100
-            
-        if diff_pct > 20:
-            verdict = "🟢 Great Deal!"
-            verdict_class = "great-deal"
-        elif diff_pct > 5:
-            verdict = "🟢 Good Deal"
-            verdict_class = "good-deal"
-        elif diff_pct > -5:
-            verdict = "🟡 Fair Price"
-            verdict_class = "fair-price"
-        elif diff_pct > -20:
-            verdict = "🟠 Slightly Overpriced"
-            verdict_class = "overpriced"
-        else:
-            verdict = "🔴 Overpriced"
-            verdict_class = "very-overpriced"
-
-    # ── 4. Retrieve Similar Products ──────────────────────────────
-    similar = idx.find_similar(result['text_embedding'], result['image_embedding'], k=6)
-
-    # ── 5. Explainability (SHAP + GradCAM) ────────────────────────
-    word_importances = compute_text_shap(
-        pred, input_text, result['image'],
-        result['image_embedding'], fair_price
-    )
-
-    gradcam_base64 = ""
-    if image_url or image_base64:
-        try:
-            gradcam_base64 = compute_gradcam(pred, result['image'])
-        except Exception as e:
-            print(f"[GradCAM] Error: {e}")
+    # ── 3. Retrieve Similar Products ──────────────────────────────
+    similar = idx.find_similar(result['text_embedding'], result['image_embedding'], k=12)
 
     return {
         "success": True,
         "product_title": title,
         "product_image": image_url or image_base64,
-        "listed_price": round(listed_price, 2) if listed_price else None,
         "predicted_fair_price": fair_price,
-        "deal_score": round(diff_pct, 1),
-        "verdict": verdict,
-        "verdict_class": verdict_class,
-        "confidence_low": result['confidence_low'],
-        "confidence_high": result['confidence_high'],
-        "similar_products": similar,
-        "word_importances": word_importances,
-        "gradcam_image": gradcam_base64,
+        "similar_products": similar
     }
-
 
 # ── Serve Static Files ──────────────────────────────────────────────────────
 

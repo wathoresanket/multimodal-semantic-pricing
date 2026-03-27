@@ -2,27 +2,6 @@
    PriceVision AI — Unified Dashboard Logic
    ═══════════════════════════════════════════════════════════════════════════ */
 
-// ── Background Particles ────────────────────────────────────────────────
-
-function createParticles() {
-    const container = document.getElementById('particles');
-    const colors = ['rgba(139,92,246,0.3)', 'rgba(59,130,246,0.2)', 'rgba(6,182,212,0.2)'];
-
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        const size = Math.random() * 4 + 2;
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
-        particle.style.animationDelay = (Math.random() * 10) + 's';
-        container.appendChild(particle);
-    }
-}
-createParticles();
-
 // ── Utility Functions ───────────────────────────────────────────────────
 
 function showToast(message) {
@@ -74,8 +53,6 @@ async function analyzeProduct() {
     if (fileInput.files && fileInput.files[0]) {
         imageBase64 = await getBase64(fileInput.files[0]);
     }
-    
-    const listedPrice = parseFloat(document.getElementById('input-price').value);
 
     if (!amazonUrl && !text) {
         showToast('Please enter an Amazon URL or product details manually');
@@ -90,7 +67,7 @@ async function analyzeProduct() {
             text: text,
             image_url: imageUrl,
             image_base64: imageBase64,
-            listed_price: isNaN(listedPrice) ? null : listedPrice,
+            listed_price: null,
         };
 
         const resp = await fetch('/api/analyze', {
@@ -124,7 +101,7 @@ async function analyzeProduct() {
 
 function renderDashboard(data) {
     // 1. Overview Section
-    document.getElementById('res-title').textContent = data.product_title;
+    document.getElementById('res-title').textContent = data.product_title || "Unknown Product Details";
     
     const imgEl = document.getElementById('res-image');
     if (data.product_image) {
@@ -134,45 +111,9 @@ function renderDashboard(data) {
         imgEl.style.display = 'none';
     }
 
-    document.getElementById('res-listed').textContent = formatPrice(data.listed_price);
     document.getElementById('res-fair').textContent = formatPrice(data.predicted_fair_price);
-    document.getElementById('res-confidence').textContent = 
-        `Confidence Range: ${formatPrice(data.confidence_low)} — ${formatPrice(data.confidence_high)}`;
 
-    // 2. Gauge Section
-    const score = Math.max(-50, Math.min(50, data.deal_score || 0));
-    const gaugePercent = ((score + 50) / 100) * 100;
-    document.getElementById('deal-gauge-fill').style.left = gaugePercent + '%';
-
-    const verdictEl = document.getElementById('res-verdict');
-    verdictEl.textContent = data.verdict;
-    verdictEl.className = `verdict ${data.verdict_class}`;
-
-    const scoreText = document.getElementById('res-score-text');
-    if (data.listed_price) {
-        scoreText.textContent = data.deal_score > 0 
-            ? `${Math.abs(data.deal_score)}% below our fair-value estimate`
-            : data.deal_score < 0 
-                ? `${Math.abs(data.deal_score)}% above our fair-value estimate`
-                : 'Exactly at our fair-value estimate';
-    } else {
-        scoreText.textContent = "No listed price provided for deal check";
-        document.getElementById('deal-gauge-fill').style.left = '50%';
-        verdictEl.textContent = "N/A";
-    }
-
-    // 3. Explainability
-    renderShapWords('res-shap', data.word_importances);
-    renderShapBars('res-shap-bars', data.word_importances);
-
-    const gradcamContainer = document.getElementById('res-gradcam');
-    if (data.gradcam_image) {
-        gradcamContainer.innerHTML = `<img src="data:image/png;base64,${data.gradcam_image}" alt="GradCAM Heatmap">`;
-    } else {
-        gradcamContainer.innerHTML = '<p class="placeholder-text" style="text-align:center;padding:40px;">No image provided — upload an image URL to see Visual Impact Heatmap</p>';
-    }
-
-    // 4. Similar Products
+    // 2. Similar Products
     renderSimilarProducts('res-similar', data.similar_products);
 
     // Show Dashboard
