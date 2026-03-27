@@ -7,10 +7,7 @@ logs/**
 *.pt
 *.bin
 *.npy
-# (Some .pkl are small, but these are large)
-!data/brand_vocab.pkl
-!data/brand_stats.pkl
-!checkpoints/meta_scaler.pkl
+*.pkl
 
 # --- Standard Gitignores ---
 __pycache__/
