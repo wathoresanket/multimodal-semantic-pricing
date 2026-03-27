@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PriceVision AI — Unified Dashboard</title>
+    <meta name="description" content="AI-powered product price prediction using multimodal deep learning with text and image analysis">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">◈</span>
+            <h1>PriceVision <span class="logo-ai">AI</span></h1>
+        </div>
+        <p class="tagline">Multimodal Price Intelligence · Explainable AI</p>
+    </header>
+
+    <main class="container">
+        <!-- Input Section -->
+        <section class="input-group search-section">
+            <div class="search-header">
+                <h2>Analyze Any Product</h2>
+                <p>Paste an Amazon URL or enter details manually to get instant AI pricing insights, similar products, and explainability heatmaps.</p>
+            </div>
+
+            <div class="input-card">
+                <label for="input-url">Amazon Product URL <span class="optional">(Will auto-extract details)</span></label>
+                <div class="search-bar">
+                    <input type="text" id="input-url" placeholder="https://www.amazon.com/dp/B0...">
+                    <button class="btn-primary btn-search" id="btn-analyze" onclick="analyzeProduct()">
+                        <span class="btn-text">Analyze</span>
+                        <span class="btn-loader" style="display:none"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="divider-or"><span>OR enter manually</span></div>
+
+            <div class="manual-inputs">
+                <div class="input-card">
+                    <label for="input-text">Product Title / Description</label>
+                    <textarea id="input-text" rows="2" placeholder="e.g. Organic Matcha Powder 100g"></textarea>
+                </div>
+                <div class="input-row">
+                    <div class="input-card flex-2">
+                        <label for="input-image">Product Image <span class="optional">(URL or Upload)</span></label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="input-image" placeholder="https://example.com/product.jpg" style="flex: 1;">
+                            <input type="file" id="input-image-file" accept="image/*" style="width: 130px; padding: 11px;">
+                        </div>
+                    </div>
+                    <div class="input-card flex-1">
+                        <label for="input-price">Listed Price ($) <span class="optional">(For deal check)</span></label>
+                        <input type="number" id="input-price" placeholder="29.99" step="0.01" min="0">
+                    </div>
+                </div>
+                <button class="btn-primary btn-manual" id="btn-analyze-manual" onclick="analyzeProduct()">
+                    <span class="btn-text">Analyze Product</span>
+                    <span class="btn-loader" style="display:none"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loading-state" style="display:none">
+            <div class="spinner"></div>
+            <p>AI is analyzing multimodal features...</p>
+            <div class="loading-steps">
+                <span>✓ Loading Text Embeddings</span>
+                <span>✓ Processing Vision Transformer</span>
+                <span>✓ Generating SHAP Values & GradCAM</span>
+            </div>
+        </div>
+
+        <!-- Master Results View -->
+        <section class="results-dashboard" id="results-dashboard" style="display:none">
+            
+            <!-- Top Row: Deal Score & Price -->
+            <div class="dashboard-row top-row">
+                <div class="glass card-overview">
+                    <div class="product-header">
+                        <img id="res-image" src="" alt="Product" style="display:none">
+                        <div class="product-info">
+                            <h3 id="res-title">Product Title</h3>
+                        </div>
+                    </div>
+                    <div class="price-compare">
+                        <div class="price-col">
+                            <span class="price-label">Listed Price</span>
+                            <span class="price-value listed" id="res-listed">N/A</span>
+                        </div>
+                        <div class="price-vs">VS</div>
+                        <div class="price-col">
+                            <span class="price-label">AI Fair Price</span>
+                            <span class="price-value fair" id="res-fair">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="confidence-range" id="res-confidence">
+                        Confidence Range: $0.00 — $0.00
+                    </div>
+                </div>
+
+                <div class="glass card-gauge">
+                    <h3>Deal Score</h3>
+                    <div class="gauge-container">
+                        <div class="gauge" id="deal-gauge">
+                            <div class="gauge-fill" id="deal-gauge-fill"></div>
+                        </div>
+                        <div class="gauge-labels">
+                            <span>Overpriced</span>
+                            <span>Fair</span>
+                            <span>Great Deal</span>
+                        </div>
+                    </div>
+                    <div class="verdict" id="res-verdict">N/A</div>
+                    <div class="deal-score-text" id="res-score-text">Enter a listed price to see deal score</div>
+                </div>
+            </div>
+
+            <!-- Middle Row: Explainability -->
+            <div class="dashboard-row explain-row">
+                <div class="glass card-shap">
+                    <h3>📝 Word Impact (Text SHAP)</h3>
+                    <p class="explain-subtitle">
+                        <span class="shap-legend-up">■ Red = Increases Price</span> · 
+                        <span class="shap-legend-down">■ Blue = Decreases Price</span>
+                    </p>
+                    <div class="shap-words" id="res-shap"></div>
+                    <div class="shap-bars" id="res-shap-bars"></div>
+                </div>
+                
+                <div class="glass card-gradcam">
+                    <h3>🖼️ Visual Impact (GradCAM)</h3>
+                    <p class="explain-subtitle">Warm colors show image regions that drive the price prediction</p>
+                    <div class="gradcam-container" id="res-gradcam"></div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Similar Products -->
+            <div class="dashboard-row similar-row">
+                <div class="glass card-similar">
+                    <h3>📦 Comparable Products in Training Data</h3>
+                    <div class="similar-grid" id="res-similar"></div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Built with PyTorch · DeBERTa-v3 · SigLIP-2 · FAISS · GradCAM</p>
+        <p class="footer-sub">Amazon ML Challenge 2025 · Multimodal Price Prediction</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

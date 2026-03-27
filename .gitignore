@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Project Specific - Data and Models
+data/
+embeddings/
+checkpoints/
+checkpoints_old/
+logs/
+*.log
+
+# Submission files
+final_submission.csv
+
+# IDEs
+.vscode/
+.idea/
