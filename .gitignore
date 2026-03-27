@@ -1,9 +1,16 @@
 # --- IGNORE ALL LARGE DATA / MODELS (GitHub Version) ---
-# This branch will only contain source code for GitHub
-checkpoints/
-data/
-embeddings/
-logs/
+checkpoints/**
+data/**
+embeddings/**
+logs/**
+# Explicit binary extensions to help IDEs
+*.pt
+*.bin
+*.npy
+# (Some .pkl are small, but these are large)
+!data/brand_vocab.pkl
+!data/brand_stats.pkl
+!checkpoints/meta_scaler.pkl
 
 # --- Standard Gitignores ---
 __pycache__/
