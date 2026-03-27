@@ -12,8 +12,8 @@ sys.path.insert(0, PROJECT_ROOT)
 
 import config
 
-INDEX_PATH = os.path.join(config.DATA_DIR, "faiss_index.bin")
-META_PATH = os.path.join(config.DATA_DIR, "faiss_meta.pkl")
+INDEX_PATH = config.FAISS_INDEX
+META_PATH  = config.FAISS_META
 
 
 class SimilarProductsIndex:

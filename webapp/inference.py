@@ -142,7 +142,7 @@ class PricePredictor:
         self.global_mean_price = self.brand_stats['brand_smooth_mean'].mean()
 
         # ── Load meta scaler ─────────────────────────────────────
-        with open(os.path.join(config.CKPT_DIR, "meta_scaler.pkl"), 'rb') as f:
+        with open(config.META_SCALER, 'rb') as f:
             self.meta_scaler = pickle.load(f)
 
         # ── Load text model (DeBERTa-v3-large) ──────────────────
