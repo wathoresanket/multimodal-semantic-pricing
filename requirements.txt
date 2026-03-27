@@ -10,3 +10,4 @@ pillow
 requests
 beautifulsoup4
 python-multipart
+huggingface-hub
