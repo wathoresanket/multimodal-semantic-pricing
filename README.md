@@ -1,3 +1,12 @@
+---
+title: Multimodal Semantic Pricing
+emoji: 🛍️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # Multimodal Semantic Pricing & Retrieval 🚀
 
 An AI-powered engine combining State-of-the-Art Vision and Language Models to predict fair market prices for products and retrieve semantically similar items across large e-commerce catalogs. Built for the **Amazon ML Challenge 2025**.
