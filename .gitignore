@@ -1,23 +1,13 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.venv/
-env/
-venv/
-ENV/
-
-# Project Specific - Data and Models
+# --- IGNORE ALL LARGE DATA / MODELS (GitHub Version) ---
+checkpoints/
 data/
 embeddings/
-checkpoints/
-checkpoints_old/
 logs/
+
+# --- Standard Gitignores ---
+__pycache__/
+*.pyc
 *.log
-
-# Submission files
-final_submission.csv
-
-# IDEs
-.vscode/
-.idea/
+.DS_Store
+.venv/
+env/

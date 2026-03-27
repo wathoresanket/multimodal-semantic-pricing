@@ -56,7 +56,21 @@ cd multimodal-semantic-pricing
 pip install -r requirements.txt
 ```
 
-*(Note: Data files and PyTorch `.pt` checkpoints are ignored via `.gitignore` and must be downloaded from the competition drive and placed in `data/` and `checkpoints/` before running).*
+*(Note: Large weight files are managed via Git LFS or manual download. See below).*
+
+## 📦 Model & Data Downloads
+
+Due to GitHub's file size limits, the following large artifacts must be downloaded manually or managed via Git LFS before running the app locally or on a server:
+
+| File Name | Required Folder | Description |
+| :--- | :--- | :--- |
+| `best_model.pt` | `/checkpoints/` | Trained MLP Fusion Weights |
+| `faiss_index.bin` | `/data/` | Binary search index (622MB) |
+| `faiss_meta.pkl` | `/data/` | Metadata for search results |
+| `meta_scaler.pkl` | `/checkpoints/` | Preprocessing scaling logic |
+
+> [!IMPORTANT]
+> If you are deploying to **Hugging Face Spaces**, you can push these files directly using Git LFS (instructions below).
 
 ### Running the Infrastructure
 
