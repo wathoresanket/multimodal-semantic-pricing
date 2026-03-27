@@ -1,4 +1,5 @@
 # --- IGNORE ALL LARGE DATA / MODELS (GitHub Version) ---
+# This branch will only contain source code for GitHub
 checkpoints/
 data/
 embeddings/
